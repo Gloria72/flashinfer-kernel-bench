@@ -1,13 +1,13 @@
 # FlashInfer Kernel Bench
 
-A correctness-first microbenchmark suite for LLM decode attention and sampling kernels.
+Small benchmark harness for attention and sampling code paths used in LLM decoding.
 
-This project is designed to connect service-level LLM serving metrics to lower-level GPU kernel behavior. It runs locally with a NumPy reference backend, can compare with Torch when installed, and records whether FlashInfer is available for later GPU-backed runs.
+The first version is deliberately plain: NumPy reference kernels, optional Torch comparison, and a report format that can be reused on a CUDA box. I wrote it this way so correctness and shapes are pinned down before swapping in faster kernels.
 
-## What It Does
+## What is here
 
 - Implements reference scaled dot-product attention in NumPy.
-- Implements deterministic top-p representative sampling for repeatable benchmark output.
+- Implements deterministic top-p representative sampling for repeatable runs.
 - Provides tiny/small/medium benchmark cases across batch size, heads, sequence length, head dimension, and vocabulary size.
 - Optionally compares against Torch `scaled_dot_product_attention`.
 - Reports correctness error versus the NumPy reference.
@@ -22,7 +22,7 @@ pip install -e ".[dev]"
 pytest
 ```
 
-Run the local fallback benchmark:
+Run the local NumPy benchmark:
 
 ```bash
 python -m flashinfer_kernel_bench.benchmark \
@@ -51,16 +51,15 @@ python -m flashinfer_kernel_bench.benchmark \
   --out reports/flashinfer-gpu
 ```
 
-The current `flashinfer-auto` mode records FlashInfer availability and keeps the NumPy reference path as the safe fallback. This gives a reliable baseline before wiring in specific FlashInfer APIs for the target kernel/version.
+Right now `flashinfer-auto` records whether FlashInfer is installed and falls back to the NumPy path. I kept it conservative because FlashInfer APIs move across versions; the reference path makes it easier to add a specific kernel call without changing the report contract.
 
-## Interview Narrative
+## Notes
 
-- Service-level decode latency depends on attention, sampling, memory movement, and scheduling.
-- Correctness comes before speed: every optimized backend should be compared against a reference.
-- Shape matters: batch size, context length, head dimension, dtype, and vocabulary size change bottlenecks.
-- A benchmark report should include hardware, Python/package versions, sequence shapes, latency distribution, and correctness error.
+- The benchmark is not trying to replace Nsight or a full serving profiler.
+- It is useful for quick shape sweeps and sanity checks.
+- On GPU, the important follow-up is to add hardware info, CUDA version, dtype, and warmup runs to the report.
+- The correctness check stays in the loop even when a faster backend is added.
 
 ## Example Result
 
 See [examples/results.md](examples/results.md).
-
