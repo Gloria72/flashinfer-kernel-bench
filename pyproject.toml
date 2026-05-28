@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flashinfer-kernel-bench"
+version = "0.1.0"
+description = "Correctness-first microbenchmarks for LLM attention and sampling kernels."
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.23"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+torch = ["torch>=2"]
+
+[project.scripts]
+flashinfer-kernel-bench = "flashinfer_kernel_bench.benchmark:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
