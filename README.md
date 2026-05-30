@@ -1,5 +1,7 @@
 # FlashInfer Kernel Bench
 
+[![CI](https://github.com/Gloria72/flashinfer-kernel-bench/actions/workflows/ci.yml/badge.svg)](https://github.com/Gloria72/flashinfer-kernel-bench/actions/workflows/ci.yml)
+
 Small benchmark harness for attention and sampling code paths used in LLM decoding.
 
 The first version is deliberately plain: NumPy reference kernels, optional Torch comparison, and a report format that can be reused on a CUDA box. I wrote it this way so correctness and shapes are pinned down before swapping in faster kernels.
